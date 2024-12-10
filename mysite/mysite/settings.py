@@ -26,8 +26,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -39,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'university',
+    'course',
     'rest_framework',
     'django_filters',
     'allauth',
@@ -117,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Bishkek'
 
 USE_L10N = True
 
@@ -125,11 +124,25 @@ USE_I18N = True
 
 USE_TZ = True
 
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+
+LANGUAGES = (
+    ('en', 'English'),
+    ('ru', 'Russian'),
+    ('ky', 'Kyrgyzstan')
+)
+
+MODELTRANSLATION_LANGUAGES = ('en', 'ru', 'ky')
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -156,21 +169,7 @@ AUTHENTICATION_BACKENDS = [
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-SOCIALACCOUNT_PROVIDERS = { }
-
-ACCOUNT_FORMS = {'signup': 'university.forms.CustomSignupForm'}
-
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
-
-LANGUAGES = (
-    ('en', 'English'),
-    ('ru', 'Russian'),
-    ('ky', 'Kyrgyzstan')
-)
-
-LOCALE_PATHS = [
-    BASE_DIR / 'locale/',
-]
+AUTH_USER_MODEL = 'course.UserProfile'
 
 
 

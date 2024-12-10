@@ -1,10 +1,10 @@
 from django_filters.rest_framework import FilterSet
-from .models import Faculty
+from .models import Category
 
 
-class MovieFilter(FilterSet):
+class CategoryFilter(FilterSet):
     class Meta:
-        model = Faculty
+        model = Category
         fields = {
             'name'
         }
