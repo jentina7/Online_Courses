@@ -47,7 +47,7 @@ class Lesson(models.Model):
     title = models.CharField(max_length=64)
     video_url = models.FileField(upload_to="lesson_video/")
     content = models.TextField()
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lesson_course")
 
     def __str__(self):
         return self.title
@@ -78,6 +78,7 @@ class Exam(models.Model):
     questions = models.ManyToManyField(Question)
     passing_score = models.PositiveSmallIntegerField(default=0)
     duration = models.PositiveIntegerField()
+    student = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="student_exam", null=True, blank=True)
 
     def __str__(self):
         return f'{self.title} - {self.course}'

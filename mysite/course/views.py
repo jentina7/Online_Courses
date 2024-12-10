@@ -1,8 +1,35 @@
-from rest_framework import viewsets, generics, permissions
+from rest_framework import viewsets, generics, status
 from .serializers import *
 from .models import *
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.response import Response
+from .permission import CheckCRUD, CheckPostPut, CheckReview, ViewCourses, CheckExam, StudentReview, GetCertificate
+
+
+class RegisterView(generics.CreateAPIView):
+    serializer_class = UserProfileSerializers
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CustomLoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception:
+            return Response({"detail": "Неверные учетные данные"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = serializer.validated_data
+        return Response(serializer.data, status= status.HTTP_200_OK)
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -26,11 +53,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class CourseListViewSet(generics.ListAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseListSerializers
+    permission_classes = [ViewCourses]
 
 
-class CourseDetailMixins(generics.RetrieveUpdateDestroyAPIView):
+class CourseDetailViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseDetailSerializers
+    permission_classes = [CheckCRUD, ViewCourses, CheckExam]
 
 
 class LessonListViewSet(generics.ListAPIView):
@@ -43,14 +72,10 @@ class LessonDetailMixins(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = LessonDetailSerializers
 
 
-class AssignmentListViewSet(generics.ListAPIView):
+class AssignmentViewSet(viewsets.ModelViewSet):
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializers
-
-
-class AssignmentDetailMixins(generics.RetrieveDestroyAPIView):
-    queryset = Assignment.objects.all()
-    serializer_class = AssignmentSerializers
+    permission_classes = [CheckPostPut]
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
@@ -61,6 +86,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 class ExamListViewSet(generics.ListAPIView):
     queryset = Exam.objects.all()
     serializer_class = ExamSerializers
+    permission_classes = [CheckExam]
 
 
 class ExamDetailMixins(generics.RetrieveDestroyAPIView):
@@ -71,8 +97,10 @@ class ExamDetailMixins(generics.RetrieveDestroyAPIView):
 class CertificateViewSet(viewsets.ModelViewSet):
     queryset = Certificate.objects.all()
     serializer_class = CertificateSerializers
+    permission_classes = [GetCertificate]
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [CheckReview, StudentReview]
